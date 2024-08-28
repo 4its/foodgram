@@ -1,7 +1,7 @@
 from django.db.models import Sum
 from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
-from djoser.views import UserViewSet
+from djoser.views import UserViewSet as DjoserUserViewSet
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated, SAFE_METHODS
@@ -15,7 +15,7 @@ from users.models import User
 from . import filters, utils, paginations, permissions, serializers
 
 
-class RecipesUserViewSet(UserViewSet):
+class UserViewSet(DjoserUserViewSet):
     def get_permissions(self):
         if self.action == 'me':
             return (IsAuthenticated(),)
@@ -57,6 +57,27 @@ class RecipesUserViewSet(UserViewSet):
             many=True,
         )
         return self.get_paginated_response(serializer.data)
+
+    @action(
+        detail=False, methods=('PUT', 'DELETE'),
+        url_path='me/avatar', permission_classes=(IsAuthenticated,)
+    )
+    def avatar(self, request):
+        user = request.user
+        if request.method == 'PUT':
+            serializer = serializers.AvatarSerializer(data=request.data)
+            if serializer.is_valid():
+                user.avatar = serializer.validated_data['avatar']
+                user.save()
+                return Response(
+                    serializers.AvatarSerializer(user).data,
+                    status=status.HTTP_200_OK
+                )
+            return Response(
+                serializer.errors, status=status.HTTP_400_BAD_REQUEST
+            )
+        user.avatar.delete(save=True)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
@@ -120,6 +141,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=('POST', 'DELETE'),)
     def favorite(self, request, pk=None):
+        get_object_or_404(Recipe, pk=pk)
         return self.base_favorite_shoppingcart_logic(
             request, pk,
             serializers.WriteFavoriteRecipeSerializer, FavoriteRecipe
@@ -127,6 +149,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=('POST', 'DELETE'),)
     def shopping_cart(self, request, pk=None):
+        get_object_or_404(Recipe, pk=pk)
         return self.base_favorite_shoppingcart_logic(
             request, pk,
             serializers.WriteShoppingCartRecipeSerializer, ShoppingCart
@@ -140,3 +163,12 @@ class RecipeViewSet(viewsets.ModelViewSet):
             'ingredient__name', 'ingredient__measurement_unit'
         ).annotate(amount=Sum('amount')).order_by('ingredient__name')
         return utils.make_file(request, shopping_list)
+
+    @action(detail=True, url_name='get-link', url_path='get-link')
+    def get_link(self, request, pk=None):
+        recipe = get_object_or_404(Recipe, pk=pk)
+        # link = request.build_absolute_uri(recipe.get_short_url())
+        return Response(
+            {'short-link': request.build_absolute_uri(recipe.get_short_url())},
+            status=status.HTTP_200_OK
+        )

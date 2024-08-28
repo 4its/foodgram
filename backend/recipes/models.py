@@ -5,6 +5,7 @@ from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models.constraints import UniqueConstraint
 from django.template.defaultfilters import truncatechars
+from django.urls import reverse
 
 User = get_user_model()
 
@@ -160,6 +161,9 @@ class Recipe(BaseNameModel):
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
         ordering = ('-pub_date',)
+
+    def get_short_url(self):
+        return reverse('short_url', args=str(self.id))
 
 
 class ShoppingCart(ShoppingAndFavoriteBaseModel):

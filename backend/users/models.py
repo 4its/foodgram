@@ -33,6 +33,12 @@ class User(AbstractUser):
         verbose_name='Фамилия',
         max_length=settings.STANDARD_FIELD_LENGTH,
     )
+    avatar = models.ImageField(
+        'Аватар пользователя',
+        upload_to='users/avatars/',
+        null=True,
+        blank=True,
+    )
 
     class Meta(AbstractUser.Meta):
         ordering = ('username',)

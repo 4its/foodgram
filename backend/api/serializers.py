@@ -28,8 +28,8 @@ class MyUserSerializer(UserSerializer):
     class Meta:
         model = User
         fields = (
-            'email', 'id', 'username',
-            'first_name', 'last_name', "is_subscribed"
+            'id', 'username', 'first_name', 'last_name',
+            'email', 'is_subscribed', 'avatar',
         )
 
     def get_is_subscribed(self, author):
@@ -44,7 +44,7 @@ class TagSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Tag
-        fields = '__all__'
+        fields = ('id', 'name', 'slug') #'__all__'
 
 
 class IngredientSerializer(serializers.ModelSerializer):
@@ -241,3 +241,11 @@ class WriteShoppingCartRecipeSerializer(BaseWriteFavoriteShoppingCart):
         if data['user'].shoppingcarts.filter(recipe=data['recipe']).exists():
             raise ValidationError('Рецепт уже добавлен в список покупок.')
         return data
+
+
+class AvatarSerializer(serializers.ModelSerializer):
+    avatar = Base64ImageField()
+
+    class Meta:
+        model = User
+        fields = ('avatar',)
