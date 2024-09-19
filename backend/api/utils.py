@@ -1,18 +1,29 @@
-from django.http import FileResponse
+from django.utils import timezone
 
 
-def make_file(request, ingredients):
-    output = 'Список покупок\n\n'
-    output += '\n'.join(
-        [f'{ingredient["ingredient__name"]}'
-         f' ({ingredient["ingredient__measurement_unit"]})'
-         f' - {ingredient["amount"]}'
-         for ingredient in ingredients
-         ]
+TIME_FORMAT = "%d-%m-%Y %H:%M"
+
+
+def make_shopping_cart_file(ingredients, recipes):
+    current_time = timezone.now().strftime(TIME_FORMAT)
+    ingredients = [
+        f"{index}. {item['ingredient__name'].capitalize()} "
+        f"({item['ingredient__measurement_unit']}) - "
+        f"{item['amount']}"
+        for index, item in enumerate(ingredients, start=1)
+    ]
+    recipes = [
+        f"{index}. {recipe.name}"
+        for index, recipe in enumerate(recipes, start=1)
+    ]
+    return "\n".join(
+        [
+            f"Дата и время: {current_time}",
+            "",
+            "Список покупок:",
+            *ingredients,
+            "",
+            "Список рецептов:",
+            *recipes,
+        ]
     )
-    response = FileResponse(
-        output, as_attachment=True,
-        filename=f'{request.user.username}_список_покупок.txt'
-    )
-    response['Content-Type'] = 'text/plain'
-    return response
