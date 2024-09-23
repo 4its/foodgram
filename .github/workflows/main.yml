@@ -35,7 +35,7 @@ jobs:
         pip install -r ./backend/requirements.txt
 
     - name: Copy .env file
-      run: cp .env.example backend/.env
+      run: cp .env.example .env
 
     - name: Test with flake8 and django tests
       env:
