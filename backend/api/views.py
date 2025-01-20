@@ -31,26 +31,26 @@ User = get_user_model()
 
 class UserViewSet(DjoserUserViewSet):
     def get_permissions(self):
-        if self.action == "me":
+        if self.action == 'me':
             return (IsAuthenticated(),)
-        if self.action == "retrieve":
+        if self.action == 'retrieve':
             return (AllowAny(),)
         return super().get_permissions()
 
     @action(
         detail=False,
-        methods=("put", "delete"),
+        methods=('put', 'delete'),
         permission_classes=(IsAuthenticated,),
-        url_path="me/avatar",
+        url_path='me/avatar',
     )
     def avatar(self, request):
         user = request.user
-        if request.method == "DELETE":
+        if request.method == 'DELETE':
             user.avatar.delete(save=True)
             return Response(status=HTTPStatus.NO_CONTENT)
         serializer = serializers.AvatarSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user.avatar = serializer.validated_data["avatar"]
+        user.avatar = serializer.validated_data['avatar']
         user.save()
         return Response(
             serializers.AvatarSerializer(user).data,
@@ -59,7 +59,7 @@ class UserViewSet(DjoserUserViewSet):
 
     @action(
         detail=False,
-        methods=("GET",),
+        methods=('GET',),
         pagination_class=pagination.LimitPageNumberPagination,
     )
     def subscriptions(self, request):
@@ -67,21 +67,21 @@ class UserViewSet(DjoserUserViewSet):
         serializer = serializers.ReadSubscriptionSerializer(
             self.paginate_queryset(queryset),
             many=True,
-            context={"request": request},
+            context={'request': request},
         )
         return self.get_paginated_response(serializer.data)
 
     @action(
         detail=True,
         methods=(
-            "POST",
-            "DELETE",
+            'POST',
+            'DELETE',
         ),
     )
     def subscribe(self, request, id):
         subscriber = request.user
         author = get_object_or_404(User, pk=id)
-        if request.method == "DELETE":
+        if request.method == 'DELETE':
             get_object_or_404(
                 Subscription, author=author, subscriber=subscriber
             ).delete()
@@ -97,7 +97,7 @@ class UserViewSet(DjoserUserViewSet):
             raise ValidationError(dict(error=Error.ALREADY_SUBSCRIBED))
         return Response(
             serializers.ReadSubscriptionSerializer(
-                author, context={"request": request}
+                author, context={'request': request}
             ).data,
             status=HTTPStatus.CREATED,
         )
@@ -115,14 +115,14 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.IngredientSerializer
     pagination_class = None
     filter_backends = (filters.IngredientFilter,)
-    search_fields = ("^name",)
+    search_fields = ('^name',)
     permission_classes = (AllowAny,)
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = (
-        Recipe.objects.prefetch_related("tags", "ingredients")
-        .select_related("author")
+        Recipe.objects.prefetch_related('tags', 'ingredients')
+        .select_related('author')
         .all()
     )
     permission_classes = (permissions.IsAuthorOrReadOnly,)
@@ -137,11 +137,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
-    @action(detail=True, url_path="get-link")
+    @action(detail=True, url_path='get-link')
     def get_link(self, request, pk=None):
         return Response(
             {
-                "short-link": request.build_absolute_uri(
+                'short-link': request.build_absolute_uri(
                     self.get_object().get_absolute_url()
                 )
             },
@@ -154,13 +154,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
             RecipeIngredient.objects.filter(
                 recipe__shoppingcarts__user=request.user
             )
-            .select_related("recipe", "ingredient")
+            .select_related('recipe', 'ingredient')
             .values(
-                "ingredient__name",
-                "ingredient__measurement_unit",
+                'ingredient__name',
+                'ingredient__measurement_unit',
             )
-            .annotate(amount=Sum("amount"))
-            .order_by("ingredient__name")
+            .annotate(amount=Sum('amount'))
+            .order_by('ingredient__name')
         )
         recipes = Recipe.objects.filter(
             shoppingcarts__user=request.user
@@ -168,19 +168,16 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return FileResponse(
             utils.make_shopping_cart_file(ingredients, recipes),
             as_attachment=True,
-            filename="shopping_cart.txt",
-            content_type="text/plain",
+            filename='shopping_cart.txt',
+            content_type='text/plain',
         )
 
     @staticmethod
     def _favorite_shopping_cart_logic(
-        request,
-        error_message_add,
-        pk,
-        model,
+        request, error_message_add, pk, model,
     ):
         recipe = get_object_or_404(Recipe, pk=pk)
-        if request.method == "DELETE":
+        if request.method == 'DELETE':
             get_object_or_404(model, recipe=recipe, user=request.user).delete()
             return Response(status=HTTPStatus.NO_CONTENT)
         item, created = model.objects.get_or_create(
@@ -193,7 +190,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             status=HTTPStatus.CREATED,
         )
 
-    @action(detail=True, methods=("POST", "DELETE"))
+    @action(detail=True, methods=('POST', 'DELETE'))
     def favorite(self, request, pk):
         return self._favorite_shopping_cart_logic(
             request,
@@ -202,7 +199,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             model=Favorite,
         )
 
-    @action(detail=True, methods=("POST", "DELETE"))
+    @action(detail=True, methods=('POST', 'DELETE'))
     def shopping_cart(self, request, pk):
         return self._favorite_shopping_cart_logic(
             request,

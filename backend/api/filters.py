@@ -9,21 +9,21 @@ from recipes.models import Recipe, Tag
 
 
 class IngredientFilter(SearchFilter):
-    search_param = "name"
+    search_param = 'name'
 
 
 class RecipeFilterSet(FilterSet):
     tags = ModelMultipleChoiceFilter(
-        field_name="tags__slug",
-        to_field_name="slug",
+        field_name='tags__slug',
+        to_field_name='slug',
         queryset=Tag.objects.all(),
     )
-    is_favorited = BooleanFilter(method="get_is_favorited")
-    is_in_shopping_cart = BooleanFilter(method="get_is_in_shopping_cart")
+    is_favorited = BooleanFilter(method='get_is_favorited')
+    is_in_shopping_cart = BooleanFilter(method='get_is_in_shopping_cart')
 
     class Meta:
         model = Recipe
-        fields = ("tags", "author", "is_favorited", "is_in_shopping_cart")
+        fields = ('tags', 'author', 'is_favorited', 'is_in_shopping_cart')
 
     def get_is_favorited(self, recipes, name, value):
         if self.request.user.is_authenticated and value:

@@ -14,41 +14,41 @@ class MinValue:
 
 
 class VerboseName:
-    NAME = "Название"
-    SLUG = "Идентификатор"
-    TAG = "Тег"
-    MEASUREMENT_UNIT = "Ед. измерения"
-    INGREDIENT = "Продукт"
-    AUTHOR = "Автор"
-    IMAGE = "Изображение"
-    TEXT = "Описание"
-    COOKING_TIME = "Время приготовления (в минутах)"
-    PUB_DATE = "Дата публикации"
-    RECIPE = "Рецепт"
-    AMOUNT = "Мера"
-    FAVORITE = "Избранное"
-    SHOPPING_CART = "Корзина покупок"
-    EMAIL = "Эл. почта"
-    USERNAME = "Уникальный юзернейм"
-    FIRST_NAME = "Имя"
-    LAST_NAME = "Фамилия"
-    AVATAR = "Фото профиля"
-    AUTHOR = "Автор"
-    SUBSCRIBER = "Подписчик"
-    SUBSCRIPTION = "Подписка"
-    USER = "Пользователь"
-    RECIPE_INGREDIENT = "Продукт рецепта"
+    NAME = 'Название'
+    SLUG = 'Идентификатор'
+    TAG = 'Тег'
+    MEASUREMENT_UNIT = 'Ед. измерения'
+    INGREDIENT = 'Продукт'
+    AUTHOR = 'Автор'
+    IMAGE = 'Изображение'
+    TEXT = 'Описание'
+    COOKING_TIME = 'Время приготовления (в минутах)'
+    PUB_DATE = 'Дата публикации'
+    RECIPE = 'Рецепт'
+    AMOUNT = 'Мера'
+    FAVORITE = 'Избранное'
+    SHOPPING_CART = 'Корзина покупок'
+    EMAIL = 'Эл. почта'
+    USERNAME = 'Уникальный юзернейм'
+    FIRST_NAME = 'Имя'
+    LAST_NAME = 'Фамилия'
+    AVATAR = 'Фото профиля'
+    AUTHOR = 'Автор'
+    SUBSCRIBER = 'Подписчик'
+    SUBSCRIPTION = 'Подписка'
+    USER = 'Пользователь'
+    RECIPE_INGREDIENT = 'Продукт рецепта'
 
 
 class VerboseNamePlural:
-    TAGS = "Теги"
-    INGREDIENTS = "Продукты"
-    RECIPES = "Рецепты"
-    FAVORITES = "Избранные рецепты"
-    SHOPPING_CARTS = "Корзины покупок"
-    SUBSCRIPTIONS = "Подписки"
-    USERS = "Пользователи"
-    RECIPE_INGREDIENTS = "Продукты рецепта"
+    TAGS = 'Теги'
+    INGREDIENTS = 'Продукты'
+    RECIPES = 'Рецепты'
+    FAVORITES = 'Избранные рецепты'
+    SHOPPING_CARTS = 'Корзины покупок'
+    SUBSCRIPTIONS = 'Подписки'
+    USERS = 'Пользователи'
+    RECIPE_INGREDIENTS = 'Продукты рецепта'
 
 
 class FieldLength:
@@ -63,25 +63,25 @@ class FieldLength:
 
 
 class Error:
-    COOKING_TIME = f"Не менее {MinValue.COOKING_TIME} мин. приготовления"
-    AMOUNT = f"Не менее {MinValue.AMOUNT} ед. ингредиента"
-    ALREADY_IN_SHOPPING_CART = "Рецепт уже есть в списке покупок"
-    ALREADY_FAVORITED = "Рецепт уже есть в избранном"
-    NOT_IN_SHOPPING_CART = "Рецепта нет в списке покупок"
-    NOT_FAVORITED = "Рецепта нет в избранном"
-    ALREADY_SUBSCRIBED = "Вы уже подписаны на этого автора"
-    CANNOT_SUBSCRIBE_TO_YOURSELF = "Нельзя подписаться на самого себя"
-    DUPLICATES = "Дубликаты: {}"
-    NO_IMAGE = "Поле 'image' не может быть пустым"
-    NOT_SUBSCRIBED = "Вы не подписаны на этого автора"
-    NO_TAGS = "Нужен хотя бы один тег"
-    NO_INGREDIENTS = "Рецепт не может обойтись без продуктов"
+    COOKING_TIME = f'Не менее {MinValue.COOKING_TIME} мин. приготовления'
+    AMOUNT = f'Не менее {MinValue.AMOUNT} ед. ингредиента'
+    ALREADY_IN_SHOPPING_CART = 'Рецепт уже есть в списке покупок'
+    ALREADY_FAVORITED = 'Рецепт уже есть в избранном'
+    NOT_IN_SHOPPING_CART = 'Рецепта нет в списке покупок'
+    NOT_FAVORITED = 'Рецепта нет в избранном'
+    ALREADY_SUBSCRIBED = 'Вы уже подписаны на этого автора'
+    CANNOT_SUBSCRIBE_TO_YOURSELF = 'Нельзя подписаться на самого себя'
+    DUPLICATES = 'Дубликаты: {}'
+    NO_IMAGE = 'Поле "image" не может быть пустым'
+    NOT_SUBSCRIBED = 'Вы не подписаны на этого автора'
+    NO_TAGS = 'Нужен хотя бы один тег'
+    NO_INGREDIENTS = 'Рецепт не может обойтись без продуктов'
 
 
 class User(AbstractUser):
 
-    USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["username", "first_name", "last_name"]
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
 
     email = models.EmailField(
         verbose_name=VerboseName.EMAIL,
@@ -110,7 +110,7 @@ class User(AbstractUser):
     class Meta(AbstractUser.Meta):
         verbose_name = VerboseName.USER
         verbose_name_plural = VerboseNamePlural.USERS
-        ordering = ("username",)
+        ordering = ('username',)
 
     def __str__(self) -> str:
         return self.username
@@ -120,28 +120,28 @@ class Subscription(models.Model):
     subscriber = models.ForeignKey(
         to=User,
         verbose_name=VerboseName.SUBSCRIBER,
-        related_name="subscribers",
+        related_name='subscribers',
         on_delete=models.CASCADE,
     )
     author = models.ForeignKey(
         to=User,
         verbose_name=VerboseName.AUTHOR,
-        related_name="authors",
+        related_name='authors',
         on_delete=models.CASCADE,
     )
 
     class Meta:
         verbose_name = VerboseName.SUBSCRIPTION
         verbose_name_plural = VerboseNamePlural.SUBSCRIPTIONS
-        ordering = ("author",)
+        ordering = ('author',)
         constraints = (
             UniqueConstraint(
-                fields=("subscriber", "author"), name="unique_%(class)s"
+                fields=('subscriber', 'author'), name='unique_%(class)s'
             ),
         )
 
     def __str__(self) -> str:
-        return f"{self.subscriber} подписан на {self.author}"
+        return f'{self.subscriber} подписан на {self.author}'
 
 
 class Tag(models.Model):
@@ -160,8 +160,8 @@ class Tag(models.Model):
     class Meta:
         verbose_name = VerboseName.TAG
         verbose_name_plural = VerboseNamePlural.TAGS
-        default_related_name = "%(class)ss"
-        ordering = ("name",)
+        default_related_name = '%(class)ss'
+        ordering = ('name',)
 
     def __str__(self) -> str:
         return self.name
@@ -180,11 +180,11 @@ class Ingredient(models.Model):
     class Meta:
         verbose_name = VerboseName.INGREDIENT
         verbose_name_plural = VerboseNamePlural.INGREDIENTS
-        default_related_name = "%(class)ss"
-        ordering = ("name",)
+        default_related_name = '%(class)ss'
+        ordering = ('name',)
 
     def __str__(self):
-        return f"{self.name} ({self.measurement_unit})"
+        return f'{self.name} ({self.measurement_unit})'
 
 
 class Recipe(models.Model):
@@ -195,7 +195,7 @@ class Recipe(models.Model):
     tags = models.ManyToManyField(to=Tag, verbose_name=VerboseNamePlural.TAGS)
     ingredients = models.ManyToManyField(
         to=Ingredient,
-        through="RecipeIngredient",
+        through='RecipeIngredient',
         verbose_name=VerboseNamePlural.INGREDIENTS,
     )
     author = models.ForeignKey(
@@ -222,14 +222,14 @@ class Recipe(models.Model):
     class Meta:
         verbose_name = VerboseName.RECIPE
         verbose_name_plural = VerboseNamePlural.RECIPES
-        default_related_name = "%(class)ss"
-        ordering = ("-pub_date",)
+        default_related_name = '%(class)ss'
+        ordering = ('-pub_date',)
 
     def __str__(self):
         return self.name
 
     def get_absolute_url(self):
-        return reverse("recipes:short_link", args=[self.pk])
+        return reverse('recipes:short_link', args=[self.pk])
 
 
 class RecipeIngredient(models.Model):
@@ -254,25 +254,25 @@ class RecipeIngredient(models.Model):
     )
 
     class Meta:
-        default_related_name = "%(class)ss"
-        ordering = ("recipe", "ingredient")
+        default_related_name = '%(class)ss'
+        ordering = ('recipe', 'ingredient')
         constraints = (
             UniqueConstraint(
-                fields=("recipe", "ingredient"), name="unique_%(class)s"
+                fields=('recipe', 'ingredient'), name='unique_%(class)s'
             ),
         )
         verbose_name = VerboseName.RECIPE_INGREDIENT
         verbose_name_plural = VerboseNamePlural.RECIPE_INGREDIENTS
 
     def __str__(self) -> str:
-        return f"Ингредиент {self.ingredient} для рецепта {self.recipe}"
+        return f'Ингредиент {self.ingredient} для рецепта {self.recipe}'
 
 
 class BaseUserRecipeModel(models.Model):
     user = models.ForeignKey(
         to=User,
         on_delete=models.CASCADE,
-        verbose_name="Пользователь",
+        verbose_name='Пользователь',
     )
     recipe = models.ForeignKey(
         to=Recipe,
@@ -282,12 +282,12 @@ class BaseUserRecipeModel(models.Model):
 
     class Meta:
         abstract = True
-        ordering = ("recipe",)
-        default_related_name = "%(class)ss"
+        ordering = ('recipe',)
+        default_related_name = '%(class)ss'
         constraints = [
             models.UniqueConstraint(
-                fields=["user", "recipe"],
-                name="unique_%(class)s",
+                fields=['user', 'recipe'],
+                name='unique_%(class)s',
             ),
         ]
 
