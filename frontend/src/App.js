@@ -292,8 +292,7 @@ function RedirectWithParams() {
               onAvatarChange={changeAvatar}
             />
 
-            <Route exact path="/s/:id" element={<RedirectWithParams />}>
-            </Route>
+            <Route exact path="/s/:id" element={<RedirectWithParams />} />
 
             <Route exact path="/recipes/:id">
               <SingleCard
