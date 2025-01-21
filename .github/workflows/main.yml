@@ -97,16 +97,29 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v3
 
+      - name: Check if frontend has changes
+        id: check_changes
+        run: |
+          git fetch origin ${{ github.ref }}
+          git diff --quiet ${{ github.event.before }} ${{ github.sha }} -- frontend/ || echo "frontend_changed=true" >> $GITHUB_ENV
+
+      - name: Skip build (no changes)
+        if: env.frontend_changed != 'true'
+        run: echo "No changes in frontend. Skipping build."
+
       - name: Set up Docker Buildx
+        if: env.frontend_changed == 'true'
         uses: docker/setup-buildx-action@v2
 
       - name: Login to Docker
+        if: env.frontend_changed == 'true'
         uses: docker/login-action@v2
         with:
           username: ${{ vars.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Push to DockerHub
+        if: env.frontend_changed == 'true'
         uses: docker/build-push-action@v4
         with:
           context: ./frontend/
@@ -114,7 +127,7 @@ jobs:
           tags: ${{ vars.DOCKER_USERNAME }}/${{ vars.PROJECT_NAME }}_frontend:latest
 
       - name: Send message if build failed
-        if: ${{ failure() }}
+        if: env.frontend_changed == 'true' && failure()
         uses: appleboy/telegram-action@master
         with:
           to: ${{ secrets.TELEGRAM_TO }}
@@ -124,6 +137,17 @@ jobs:
           message: |
             Error on build <b>FRONTEND</b> on repository: ${{ github.repository }}
             <a href="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}">Click here for more information</a>
+
+      - name: Send success message
+        if: env.frontend_changed != 'true'
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          disable_web_page_preview: true
+          format: html
+          message: |
+            No changes in <b>FRONTEND</b>. Skipping build.
 
   deploy:
     runs-on: ubuntu-latest
