@@ -213,8 +213,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
 @require_GET
 def short_url(request, pk):
-    try:
-        Recipe.objects.filter(pk=pk).exists()
-        return redirect(f'/recipes/{pk}/')
-    except Exception:
+    if not Recipe.objects.filter(pk=pk).exists():
         raise ValidationError(Error.NOT_EXIST)
+    return redirect(f'/recipes/{pk}/', )

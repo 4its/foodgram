@@ -9,7 +9,6 @@ from api.views import RecipeViewSet, short_url
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('api.urls')),
-    path('recipes/<int:pk>/', RecipeViewSet.as_view({'get': 'retrieve'})),
     path('s/<int:pk>/', short_url, name='short_url'),
 ]
 
