@@ -1,6 +1,6 @@
 import "./fonts/SanFranciscoProDisplay/fonts.css";
 import "./App.css";
-import { Switch, Route, useHistory, Redirect } from "react-router-dom";
+import { Switch, Route, useHistory, Redirect, useParams } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import { Header, Footer, ProtectedRoute } from "./components";
 import api from "./api";
@@ -284,6 +284,13 @@ function App() {
               loggedIn={loggedIn}
               onAvatarChange={changeAvatar}
             />
+
+            <Route exact path="/s/:id">
+            {() => {
+              const { id } = useParams();
+              return <Redirect to={`/recipes/${id}`} />;
+            }}
+            </Route>
 
             <Route exact path="/recipes/:id">
               <SingleCard
