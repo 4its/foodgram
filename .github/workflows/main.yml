@@ -101,10 +101,17 @@ jobs:
         id: check_changes
         run: |
           git fetch origin ${{ github.ref }}
-          git diff --quiet ${{ github.event.before }} ${{ github.sha }} -- frontend/ || echo "frontend_changed=true" >> $GITHUB_ENV
+          if git diff --quiet ${{ github.event.before }} ${{ github.sha }} -- frontend/; then
+            echo "frontend_changed=false" >> $GITHUB_ENV
+          else
+            echo "frontend_changed=true" >> $GITHUB_ENV
+
+      - name: Log change detection
+        run:
+          echo "Frontend changed: ${{ env.frontend_changed }}"
 
       - name: Skip build (no changes)
-        if: env.frontend_changed != 'true'
+        if: env.frontend_changed == 'false'
         run: echo "No changes in frontend. Skipping build."
 
       - name: Set up Docker Buildx
@@ -139,7 +146,7 @@ jobs:
             <a href="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}">Click here for more information</a>
 
       - name: Send success message
-        if: env.frontend_changed != 'true'
+        if: env.frontend_changed == 'false'
         uses: appleboy/telegram-action@master
         with:
           to: ${{ secrets.TELEGRAM_TO }}
