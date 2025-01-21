@@ -210,6 +210,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             model=ShoppingCart,
         )
 
+
 @require_GET
 def short_url(request, pk):
     try:
