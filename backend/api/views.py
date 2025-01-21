@@ -141,11 +141,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, url_path='get-link')
     def get_link(self, request, pk=None):
-        recipe = get_object_or_404(Recipe, pk=pk)
-        rev_link = reverse('short_url', args=[recipe.pk])
         return Response(
             {
-                'short-link': request.build_absolute_uri(rev_link)
+                'short-link': request.build_absolute_uri(
+                    reverse('short_url', kwargs={'pk': pk})
+                )
             },
             status=HTTPStatus.OK,
         )
