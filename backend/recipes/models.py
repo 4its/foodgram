@@ -76,6 +76,7 @@ class Error:
     NOT_SUBSCRIBED = 'Вы не подписаны на этого автора'
     NO_TAGS = 'Нужен хотя бы один тег'
     NO_INGREDIENTS = 'Рецепт не может обойтись без продуктов'
+    NOT_EXIST = 'Рецепт не существует'
 
 
 class User(AbstractUser):

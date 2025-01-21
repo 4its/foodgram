@@ -3,7 +3,8 @@ from http import HTTPStatus
 from django.contrib.auth import get_user_model
 from django.db.models import Sum
 from django.http import FileResponse
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
+from django.views.decorators.http import require_GET
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet as DjoserUserViewSet
 from rest_framework import viewsets
@@ -11,6 +12,7 @@ from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import SAFE_METHODS, AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.reverse import reverse
 
 from recipes.models import (
     Error,
@@ -142,7 +144,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return Response(
             {
                 'short-link': request.build_absolute_uri(
-                    self.get_object().get_absolute_url()
+                    reverse('short_url', args=self.get_object().pk)
                 )
             },
             status=HTTPStatus.OK,
@@ -207,3 +209,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
             pk=pk,
             model=ShoppingCart,
         )
+
+@require_GET
+def short_url(request, pk):
+    try:
+        Recipe.objects.filter(pk=pk).exists()
+        return redirect(f'/recipes/{pk}/')
+    except Exception:
+        raise ValidationError(Error.NOT_EXIST)
