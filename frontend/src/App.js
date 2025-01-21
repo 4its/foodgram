@@ -1,6 +1,6 @@
 import "./fonts/SanFranciscoProDisplay/fonts.css";
 import "./App.css";
-import { Switch, Route, useHistory, Redirect, useParams, Navigate } from "react-router-dom";
+import { Switch, Route, useHistory, Redirect, useParams } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import { Header, Footer, ProtectedRoute } from "./components";
 import api from "./api";
@@ -39,7 +39,7 @@ function App() {
 
 function RedirectWithParams() {
   const { id } = useParams();
-  return <Navigate to={`/recipes/${id}`} />;
+  return <Redirect to={`/recipes/${id}`} />;
 }
 
   const registration = ({
