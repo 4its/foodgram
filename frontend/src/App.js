@@ -1,6 +1,6 @@
 import "./fonts/SanFranciscoProDisplay/fonts.css";
 import "./App.css";
-import { Switch, Route, useHistory, Redirect, useParams } from "react-router-dom";
+import { Switch, Route, useHistory, Redirect, useParams, Navigate } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import { Header, Footer, ProtectedRoute } from "./components";
 import api from "./api";
@@ -36,6 +36,11 @@ function App() {
   const [changePasswordError, setChangePasswordError] = useState({
     submitError: "",
   });
+
+function RedirectWithParams() {
+  const { id } = useParams();
+  return <Navigate to={`/recipes/${id}`} />;
+}
 
   const registration = ({
     email,
@@ -217,6 +222,8 @@ function App() {
     return <div className={styles.loading}>Загрузка...</div>;
   }
 
+
+
   return (
     <AuthContext.Provider value={loggedIn}>
       <UserContext.Provider value={user}>
@@ -285,11 +292,7 @@ function App() {
               onAvatarChange={changeAvatar}
             />
 
-            <Route exact path="/s/:id">
-            {() => {
-              const { id } = useParams();
-              return <Redirect to={`/recipes/${id}`} />;
-            }}
+            <Route exact path="/s/:id" element={<RedirectWithParams />}>
             </Route>
 
             <Route exact path="/recipes/:id">
