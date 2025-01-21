@@ -107,7 +107,7 @@ jobs:
             echo "frontend_changed=true" >> $GITHUB_ENV
 
       - name: Log change detection
-        run:
+        run: | 
           echo "Frontend changed: ${{ env.frontend_changed }}"
 
       - name: Skip build (no changes)
@@ -146,7 +146,7 @@ jobs:
             <a href="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}">Click here for more information</a>
 
       - name: Send success message
-        if: env.frontend_changed == 'false'
+        if: env.frontend_changed != 'true'
         uses: appleboy/telegram-action@master
         with:
           to: ${{ secrets.TELEGRAM_TO }}
