@@ -97,11 +97,16 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v3
 
+      - name: Debug SHA values
+        run: |
+          echo "Current SHA: ${{ github.sha }}"
+          echo "Previous SHA: ${{ github.event.before }}"
+
       - name: Check if frontend has changes
         id: check_changes
         run: |
           git fetch origin ${{ github.ref }}
-          if git diff --quiet ${{ github.event.before }} ${{ github.sha }} -- frontend/; then
+          if git diff --quiet HEAD~1 HEAD -- frontend/; then
             echo "frontend_changed=false" >> $GITHUB_ENV
           else
             echo "frontend_changed=true" >> $GITHUB_ENV
