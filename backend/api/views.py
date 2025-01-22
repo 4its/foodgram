@@ -209,10 +209,3 @@ class RecipeViewSet(viewsets.ModelViewSet):
             pk=pk,
             model=ShoppingCart,
         )
-
-
-@require_GET
-def short_url(request, pk):
-    if not Recipe.objects.filter(pk=pk).exists():
-        raise ValidationError(Error.NOT_EXIST)
-    return redirect(f'/recipes/{pk}/', )
