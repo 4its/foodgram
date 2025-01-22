@@ -3,7 +3,8 @@ from http import HTTPStatus
 from django.contrib.auth import get_user_model
 from django.db.models import Sum
 from django.http import FileResponse
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
+from django.views.decorators.http import require_GET
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet as DjoserUserViewSet
 from rest_framework import viewsets
@@ -208,3 +209,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
             pk=pk,
             model=ShoppingCart,
         )
+
+
+@require_GET
+def short_url(request, pk):
+    if not Recipe.objects.filter(pk=pk).exists():
+        raise ValidationError(Error.NOT_EXIST)
+    return redirect(f'/recipes/{pk}/', )
