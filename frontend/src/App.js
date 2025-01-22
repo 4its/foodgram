@@ -1,13 +1,13 @@
 import "./fonts/SanFranciscoProDisplay/fonts.css";
 import "./App.css";
-import { Switch, Route, useHistory, Redirect, useParams } from "react-router-dom";
+import { Switch, Route, useHistory, Redirect } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import { Header, Footer, ProtectedRoute } from "./components";
 import api from "./api";
 import styles from "./styles.module.css";
 
 import {
-  // About,
+  About,
   Main,
   Cart,
   SignIn,
@@ -22,7 +22,7 @@ import {
   NotFound,
   UpdateAvatar,
   ResetPassword,
-  // Technologies,
+  Technologies,
 } from "./pages";
 
 import { AuthContext, UserContext } from "./contexts";
@@ -36,11 +36,6 @@ function App() {
   const [changePasswordError, setChangePasswordError] = useState({
     submitError: "",
   });
-
-function RedirectWithParams() {
-  const { id } = useParams();
-  return <Redirect to={`/recipes/${id}`} />;
-}
 
   const registration = ({
     email,
@@ -292,8 +287,6 @@ function RedirectWithParams() {
               onAvatarChange={changeAvatar}
             />
 
-            <Route exact path="/s/:id" component={RedirectWithParams} />
-
             <Route exact path="/recipes/:id">
               <SingleCard
                 loggedIn={loggedIn}
@@ -303,8 +296,7 @@ function RedirectWithParams() {
             </Route>
 
             <Route exact path="/about">
-              <NotFound />
-              {/* <About component={About} /> */}
+               <About component={About} />
             </Route>
 
             <Route exact path="/reset-password">
@@ -312,8 +304,7 @@ function RedirectWithParams() {
             </Route>
 
             <Route exact path="/technologies">
-              <NotFound />
-              {/* <Technologies component={Technologies}/> */}
+               <Technologies component={Technologies}/>
             </Route>
 
             <Route exact path="/recipes">
