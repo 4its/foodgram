@@ -141,14 +141,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, url_path='get-link')
     def get_link(self, request, pk=None):
-        return Response(
-            {
-                'short-link': request.build_absolute_uri(
-                    reverse('short_url', kwargs={'pk': pk})
-                )
-            },
-            status=HTTPStatus.OK,
+        short_url_code = get_object_or_404(Recipe, pk=pk).short_url_code
+        short_url = request.build_absolute_uri(
+            reverse('short_url', args=(short_url_code,))
         )
+        return Response({'short-link': short_url}, status=HTTPStatus.OK)
 
     @action(detail=False)
     def download_shopping_cart(self, request):
@@ -209,10 +206,3 @@ class RecipeViewSet(viewsets.ModelViewSet):
             pk=pk,
             model=ShoppingCart,
         )
-
-
-@require_GET
-def short_url(request, pk):
-    if not Recipe.objects.filter(pk=pk).exists():
-        raise ValidationError(Error.NOT_EXIST)
-    return redirect(f'/recipes/{pk}/', )

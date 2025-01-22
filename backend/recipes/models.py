@@ -1,7 +1,10 @@
+from random import choices
+from string import ascii_letters, digits
+
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinValueValidator
-from django.db import models
+from django.db import models, IntegrityError
 from django.db.models.constraints import UniqueConstraint
 from django.urls import reverse
 
@@ -38,6 +41,7 @@ class VerboseName:
     SUBSCRIPTION = 'Подписка'
     USER = 'Пользователь'
     RECIPE_INGREDIENT = 'Продукт рецепта'
+    SHORT_URL_CODE = 'Код рецепта'
 
 
 class VerboseNamePlural:
@@ -49,6 +53,7 @@ class VerboseNamePlural:
     SUBSCRIPTIONS = 'Подписки'
     USERS = 'Пользователи'
     RECIPE_INGREDIENTS = 'Продукты рецепта'
+    SHORT_URL_CODE = 'Коды рецептов'
 
 
 class FieldLength:
@@ -60,6 +65,7 @@ class FieldLength:
     USERNAME = 150
     FIRST_NAME = 150
     LAST_NAME = 150
+    SHORT_URL_CODE = 6
 
 
 class Error:
@@ -77,6 +83,10 @@ class Error:
     NO_TAGS = 'Нужен хотя бы один тег'
     NO_INGREDIENTS = 'Рецепт не может обойтись без продуктов'
     NOT_EXIST = 'Рецепт не существует'
+    SHORT_URL_CODE = 'Не удалось сгенерировать уникальный код'
+    SHORT_URL_CODE_GEN = (
+        'Превышено количество попыток генерации short_url_code.'
+    )
 
 
 class User(AbstractUser):
@@ -189,6 +199,9 @@ class Ingredient(models.Model):
 
 
 class Recipe(models.Model):
+    MAX_ATTEMPTS = 30
+    AVAILIBLE_CHARS = ascii_letters + digits
+
     name = models.CharField(
         verbose_name=VerboseName.NAME,
         max_length=FieldLength.RECIPE_NAME,
@@ -216,6 +229,11 @@ class Recipe(models.Model):
             )
         ],
     )
+    short_url_code = models.SlugField(
+        verbose_name=VerboseName.SHORT_URL_CODE,
+        max_length=FieldLength.SHORT_URL_CODE,
+        unique=True,
+    )
     pub_date = models.DateTimeField(
         verbose_name=VerboseName.PUB_DATE, auto_now_add=True
     )
@@ -231,6 +249,30 @@ class Recipe(models.Model):
 
     def get_absolute_url(self):
         return reverse('recipes:short_link', args=[self.pk])
+
+    @staticmethod
+    def generate_short(self):
+        for _ in range(self.MAX_ATTEMPTS):
+            short = ''.join(
+                choices(self.AVAILIBLE_CHARS, k=FieldLength.SHORT_URL_CODE)
+            )
+            if not Recipe.objects.filter(short_url_code=short).exists():
+                return short
+        raise RuntimeError(Error.SHORT_URL_CODE)
+
+    def save(self, *args, **kwargs):
+        if not self.short_url_code:
+            self.short_url_code = self.generate_short()
+        attempts = 0
+        while True:
+            try:
+                super().save(*args, **kwargs)
+                break
+            except IntegrityError:
+                attempts += 1
+                if attempts >= self.MAX_ATTEMPTS:
+                    raise RuntimeError(Error.SHORT_URL_CODE_GEN)
+                self.short_url_code = self.generate_short()
 
 
 class RecipeIngredient(models.Model):
